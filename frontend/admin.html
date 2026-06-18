@@ -1,0 +1,2318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BSCRI - Admin Dashboard</title>
+
+    <!-- Chart.js for charts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js">
+    </script>
+
+    <style>
+        /* ============================================================
+           RESET & BASE STYLES
+           ============================================================ */
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --color-primary: #1a3a6b;
+            --color-primary-light: #2a5a8b;
+            --color-primary-dark: #0f2747;
+            --color-secondary: #4a90d9;
+            --color-accent: #e8f0fe;
+            --color-accent-hover: #d4e2f8;
+            --color-text: #1a1a2e;
+            --color-text-light: #4a4a6a;
+            --color-text-muted: #6b6b8a;
+            --color-white: #ffffff;
+            --color-gray-50: #f8f9fa;
+            --color-gray-100: #e9ecef;
+            --color-gray-200: #dee2e6;
+            --color-gray-300: #ced4da;
+            --color-gray-400: #adb5bd;
+            --color-gray-600: #6c757d;
+            --color-gray-800: #343a40;
+            --color-success: #198754;
+            --color-success-bg: #d1e7dd;
+            --color-warning: #ffc107;
+            --color-warning-bg: #fff3cd;
+            --color-danger: #dc3545;
+            --color-danger-bg: #f8d7da;
+            --color-info: #0d6efd;
+            --color-info-bg: #cfe2ff;
+            --color-orange: #fd7e14;
+            --color-orange-bg: #ffe5d0;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.12);
+            --shadow-xl: 0 12px 60px rgba(0, 0, 0, 0.16);
+            --radius: 12px;
+            --radius-sm: 6px;
+            --radius-lg: 16px;
+            --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, system-ui, sans-serif;
+            --max-width: 1200px;
+            --header-height: 64px;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        body {
+            font-family: var(--font-family);
+            color: var(--color-text);
+            background: var(--color-gray-50);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* ============================================================
+           CONTAINER
+           ============================================================ */
+
+        .container {
+            max-width: var(--max-width);
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* ============================================================
+           HEADER
+           ============================================================ */
+
+        .app-header {
+            background: var(--color-white);
+            border-bottom: 1px solid var(--color-gray-200);
+            padding: 10px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow-sm);
+            backdrop-filter: blur(8px);
+            background: rgba(255, 255, 255, 0.92);
+            height: var(--header-height);
+            display: flex;
+            align-items: center;
+        }
+
+        .app-header .container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+        }
+
+        .app-brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .brand-logo {
+            height: 36px;
+            width: auto;
+            object-fit: contain;
+        }
+
+        .brand-text {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .app-brand .logo {
+            font-weight: 700;
+            font-size: 20px;
+            color: var(--color-primary);
+            letter-spacing: -0.5px;
+            text-decoration: none;
+        }
+
+        .app-brand .logo span {
+            color: var(--color-secondary);
+        }
+
+        .app-brand .divider {
+            width: 1px;
+            height: 24px;
+            background: var(--color-gray-300);
+        }
+
+        .app-brand .subtitle {
+            font-size: 12px;
+            color: var(--color-text-light);
+            font-weight: 400;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-badge {
+            background: var(--color-accent);
+            color: var(--color-primary);
+            font-size: 10px;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 20px;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+            border: 1px solid rgba(26, 58, 107, 0.08);
+        }
+
+        .btn-logout {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: transparent;
+            color: var(--color-text-light);
+            font-size: 13px;
+            font-weight: 500;
+            padding: 6px 14px;
+            border: 1px solid var(--color-gray-300);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all var(--transition);
+            font-family: var(--font-family);
+        }
+
+        .btn-logout:hover {
+            background: var(--color-gray-100);
+            border-color: var(--color-gray-400);
+        }
+
+        .btn-logout svg {
+            width: 16px;
+            height: 16px;
+            stroke: currentColor;
+            stroke-width: 2;
+            fill: none;
+        }
+
+        /* ============================================================
+           SECTIONS
+           ============================================================ */
+
+        .section {
+            background: var(--color-white);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            padding: 32px 36px;
+            margin: 24px 0;
+            border: 1px solid var(--color-gray-100);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        .section-hidden {
+            display: none;
+        }
+
+        .section-visible {
+            display: block;
+            animation: sectionFadeIn 0.6s ease forwards;
+        }
+
+        @keyframes sectionFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ============================================================
+           LOGIN SECTION
+           ============================================================ */
+
+        .login-container {
+            max-width: 440px;
+            margin: 60px auto;
+            padding: 40px 44px;
+            background: var(--color-white);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--color-gray-100);
+        }
+
+        .login-container .login-header {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        .login-container .login-header .login-logo {
+            height: 56px;
+            width: auto;
+            margin-bottom: 12px;
+        }
+
+        .login-container .login-header h2 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--color-primary);
+        }
+
+        .login-container .login-header p {
+            font-size: 14px;
+            color: var(--color-text-light);
+            margin-top: 4px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--color-text);
+            margin-bottom: 4px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid var(--color-gray-300);
+            border-radius: var(--radius-sm);
+            font-size: 15px;
+            font-family: var(--font-family);
+            transition: border-color var(--transition), box-shadow var(--transition);
+            background: var(--color-white);
+            color: var(--color-text);
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--color-secondary);
+            box-shadow: 0 0 0 3px rgba(74, 144, 217, 0.15);
+        }
+
+        .form-group input:disabled {
+            background: var(--color-gray-50);
+            cursor: not-allowed;
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 12px;
+            background: var(--color-primary);
+            color: var(--color-white);
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all var(--transition);
+            font-family: var(--font-family);
+        }
+
+        .btn-login:hover:not(:disabled) {
+            background: var(--color-primary-light);
+            box-shadow: 0 4px 16px rgba(26, 58, 107, 0.2);
+        }
+
+        .btn-login:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .login-error {
+            background: var(--color-danger-bg);
+            color: var(--color-danger);
+            padding: 10px 14px;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            margin-bottom: 16px;
+            border-left: 3px solid var(--color-danger);
+            display: none;
+        }
+
+        .login-error.visible {
+            display: block;
+            animation: alertShake 0.5s ease;
+        }
+
+        @keyframes alertShake {
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+            20% {
+                transform: translateX(-6px);
+            }
+            40% {
+                transform: translateX(6px);
+            }
+            60% {
+                transform: translateX(-3px);
+            }
+            80% {
+                transform: translateX(3px);
+            }
+        }
+
+        .login-footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 12px;
+            color: var(--color-text-muted);
+        }
+
+        .login-footer strong {
+            color: var(--color-primary);
+        }
+
+        /* ============================================================
+           DASHBOARD
+           ============================================================ */
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .dashboard-header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--color-primary);
+        }
+
+        .dashboard-header .last-updated {
+            font-size: 13px;
+            color: var(--color-text-muted);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+
+        .stats-grid .stat-card {
+            background: var(--color-gray-50);
+            border-radius: var(--radius-sm);
+            padding: 18px 20px;
+            border: 1px solid var(--color-gray-200);
+            transition: all var(--transition);
+        }
+
+        .stats-grid .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+            background: var(--color-white);
+        }
+
+        .stats-grid .stat-card .stat-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--color-text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .stats-grid .stat-card .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--color-primary);
+            line-height: 1.2;
+        }
+
+        .stats-grid .stat-card .stat-sub {
+            font-size: 13px;
+            color: var(--color-text-light);
+        }
+
+        .stats-grid .stat-card .stat-trend {
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 4px;
+        }
+
+        .stat-trend.up {
+            color: var(--color-success);
+        }
+        .stat-trend.down {
+            color: var(--color-danger);
+        }
+        .stat-trend.neutral {
+            color: var(--color-text-muted);
+        }
+
+        .chart-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 28px;
+        }
+
+        .chart-box {
+            background: var(--color-gray-50);
+            border-radius: var(--radius-sm);
+            padding: 20px;
+            border: 1px solid var(--color-gray-200);
+        }
+
+        .chart-box h4 {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--color-text-light);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .chart-box canvas {
+            width: 100% !important;
+            max-height: 220px;
+        }
+
+        /* ============================================================
+           ASSESSMENTS TABLE
+           ============================================================ */
+
+        .table-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .table-toolbar .filters {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .table-toolbar .filters select,
+        .table-toolbar .filters input {
+            padding: 6px 12px;
+            border: 1px solid var(--color-gray-300);
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            font-family: var(--font-family);
+            background: var(--color-white);
+            color: var(--color-text);
+        }
+
+        .table-toolbar .filters select:focus,
+        .table-toolbar .filters input:focus {
+            outline: none;
+            border-color: var(--color-secondary);
+        }
+
+        .table-toolbar .actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-export {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            background: var(--color-primary);
+            color: var(--color-white);
+            font-size: 13px;
+            font-weight: 600;
+            border: none;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all var(--transition);
+            font-family: var(--font-family);
+        }
+
+        .btn-export:hover {
+            background: var(--color-primary-light);
+            box-shadow: 0 4px 12px rgba(26, 58, 107, 0.2);
+        }
+
+        .btn-export svg {
+            width: 16px;
+            height: 16px;
+            stroke: currentColor;
+            stroke-width: 2.5;
+            fill: none;
+        }
+
+        .btn-refresh {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            background: var(--color-gray-200);
+            color: var(--color-text);
+            font-size: 13px;
+            font-weight: 500;
+            border: none;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all var(--transition);
+            font-family: var(--font-family);
+        }
+
+        .btn-refresh:hover {
+            background: var(--color-gray-300);
+        }
+
+        .btn-refresh svg {
+            width: 16px;
+            height: 16px;
+            stroke: currentColor;
+            stroke-width: 2.5;
+            fill: none;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--color-gray-200);
+        }
+
+        .table-wrapper table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        .table-wrapper thead {
+            background: var(--color-gray-50);
+            border-bottom: 2px solid var(--color-gray-200);
+        }
+
+        .table-wrapper th {
+            text-align: left;
+            padding: 12px 16px;
+            font-weight: 600;
+            color: var(--color-text-light);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            white-space: nowrap;
+        }
+
+        .table-wrapper td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--color-gray-100);
+            vertical-align: middle;
+        }
+
+        .table-wrapper tr:last-child td {
+            border-bottom: none;
+        }
+
+        .table-wrapper tr:hover td {
+            background: var(--color-gray-50);
+        }
+
+        .table-wrapper .score-badge {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .score-high {
+            background: var(--color-success-bg);
+            color: var(--color-success);
+        }
+        .score-mid {
+            background: var(--color-warning-bg);
+            color: #856404;
+        }
+        .score-low {
+            background: var(--color-danger-bg);
+            color: var(--color-danger);
+        }
+
+        .table-wrapper .maturity-tag {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            color: var(--color-white);
+        }
+
+        .maturity-foundational {
+            background: var(--color-danger);
+        }
+        .maturity-emerging {
+            background: var(--color-orange);
+        }
+        .maturity-developing {
+            background: var(--color-warning);
+            color: var(--color-text);
+        }
+        .maturity-established {
+            background: var(--color-info);
+        }
+        .maturity-advanced {
+            background: var(--color-success);
+        }
+
+        .table-wrapper .btn-view {
+            padding: 4px 12px;
+            background: var(--color-accent);
+            color: var(--color-primary);
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition);
+            font-family: var(--font-family);
+        }
+
+        .table-wrapper .btn-view:hover {
+            background: var(--color-primary);
+            color: var(--color-white);
+        }
+
+        .table-pagination {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0 4px;
+            font-size: 13px;
+            color: var(--color-text-muted);
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .table-pagination .pagination-buttons {
+            display: flex;
+            gap: 6px;
+        }
+
+        .table-pagination .pagination-buttons button {
+            padding: 4px 12px;
+            border: 1px solid var(--color-gray-300);
+            border-radius: var(--radius-sm);
+            background: var(--color-white);
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            font-family: var(--font-family);
+            transition: all var(--transition);
+        }
+
+        .table-pagination .pagination-buttons button:hover:not(:disabled) {
+            background: var(--color-gray-100);
+        }
+
+        .table-pagination .pagination-buttons button:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .table-pagination .pagination-buttons button.active {
+            background: var(--color-primary);
+            color: var(--color-white);
+            border-color: var(--color-primary);
+        }
+
+        /* ============================================================
+           DETAIL MODAL
+           ============================================================ */
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            animation: modalFadeIn 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .modal-content {
+            background: var(--color-white);
+            border-radius: var(--radius-lg);
+            max-width: 720px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 32px 36px;
+            box-shadow: var(--shadow-xl);
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 16px;
+            right: 20px;
+            background: transparent;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--color-text-light);
+            transition: color var(--transition);
+            font-family: var(--font-family);
+        }
+
+        .modal-close:hover {
+            color: var(--color-text);
+        }
+
+        .modal-content h2 {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--color-primary);
+            margin-bottom: 4px;
+        }
+
+        .modal-content .modal-subtitle {
+            font-size: 14px;
+            color: var(--color-text-muted);
+            margin-bottom: 20px;
+        }
+
+        .modal-content .detail-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .modal-content .detail-item {
+            background: var(--color-gray-50);
+            border-radius: var(--radius-sm);
+            padding: 12px 16px;
+        }
+
+        .modal-content .detail-item .label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--color-text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .modal-content .detail-item .value {
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--color-text);
+        }
+
+        .modal-content .detail-scores {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .modal-content .detail-scores .score-item {
+            background: var(--color-gray-50);
+            border-radius: var(--radius-sm);
+            padding: 10px 14px;
+            text-align: center;
+        }
+
+        .modal-content .detail-scores .score-item .dim {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--color-text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .modal-content .detail-scores .score-item .val {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--color-primary);
+        }
+
+        .modal-content .detail-responses {
+            margin-top: 16px;
+        }
+
+        .modal-content .detail-responses h4 {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--color-text-light);
+            margin-bottom: 10px;
+        }
+
+        .modal-content .detail-responses .response-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            border-bottom: 1px solid var(--color-gray-100);
+            font-size: 13px;
+        }
+
+        .modal-content .detail-responses .response-item .q {
+            color: var(--color-text-light);
+        }
+
+        .modal-content .detail-responses .response-item .a {
+            font-weight: 500;
+        }
+
+        /* ============================================================
+           LOADING
+           ============================================================ */
+
+        .loading-overlay {
+            text-align: center;
+            padding: 40px 0;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--color-gray-200);
+            border-top-color: var(--color-primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading-text {
+            margin-top: 12px;
+            font-size: 14px;
+            color: var(--color-text-light);
+        }
+
+        /* ============================================================
+           EMPTY STATE
+           ============================================================ */
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--color-text-muted);
+        }
+
+        .empty-state .empty-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+        }
+
+        .empty-state h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--color-text);
+        }
+
+        .empty-state p {
+            font-size: 14px;
+            max-width: 400px;
+            margin: 4px auto 0;
+        }
+
+        /* ============================================================
+           FOOTER
+           ============================================================ */
+
+        .app-footer {
+            text-align: center;
+            padding: 20px 0 32px;
+            font-size: 12px;
+            color: var(--color-text-muted);
+            border-top: 1px solid var(--color-gray-200);
+            margin-top: 8px;
+        }
+
+        .app-footer strong {
+            color: var(--color-primary);
+        }
+
+        .app-footer .footer-links {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            margin-top: 6px;
+            flex-wrap: wrap;
+        }
+
+        .app-footer .footer-links a {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--color-text-light);
+            text-decoration: none;
+            font-size: 12px;
+            transition: color var(--transition);
+        }
+
+        .app-footer .footer-links a:hover {
+            color: var(--color-primary);
+            text-decoration: underline;
+        }
+
+        .app-footer .footer-links a svg {
+            width: 16px;
+            height: 16px;
+            fill: currentColor;
+        }
+
+        /* ============================================================
+           RESPONSIVE
+           ============================================================ */
+
+        @media (max-width: 768px) {
+            .section {
+                padding: 20px 16px;
+                margin: 16px 0;
+            }
+
+            .login-container {
+                margin: 40px auto;
+                padding: 28px 20px;
+            }
+
+            .chart-row {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .app-brand .subtitle {
+                display: none;
+            }
+            .app-brand .divider {
+                display: none;
+            }
+
+            .brand-logo {
+                height: 28px;
+            }
+
+            .app-header .container {
+                flex-wrap: wrap;
+                gap: 6px;
+            }
+
+            .dashboard-header h1 {
+                font-size: 20px;
+            }
+
+            .table-toolbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .table-toolbar .filters {
+                flex-direction: column;
+            }
+
+            .modal-content {
+                padding: 24px 18px;
+                margin: 12px;
+            }
+
+            .modal-content .detail-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-content .detail-scores {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .table-pagination {
+                flex-direction: column;
+                align-items: stretch;
+                text-align: center;
+            }
+
+            .table-pagination .pagination-buttons {
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+
+            .header-actions .header-badge {
+                display: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 0 12px;
+            }
+
+            .section {
+                padding: 16px 12px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .login-container {
+                margin: 24px auto;
+                padding: 20px 16px;
+            }
+
+            .login-container .login-header h2 {
+                font-size: 20px;
+            }
+
+            .modal-content .detail-scores {
+                grid-template-columns: 1fr;
+            }
+
+            .table-wrapper table {
+                font-size: 12px;
+            }
+
+            .table-wrapper th,
+            .table-wrapper td {
+                padding: 8px 10px;
+            }
+        }
+
+        /* ============================================================
+           UTILITIES
+           ============================================================ */
+
+        .fade-in {
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .text-center {
+            text-align: center;
+        }
+        .mt-8 {
+            margin-top: 8px;
+        }
+        .mt-16 {
+            margin-top: 16px;
+        }
+        .mt-24 {
+            margin-top: 24px;
+        }
+        .mb-16 {
+            margin-bottom: 16px;
+        }
+        .mb-24 {
+            margin-bottom: 24px;
+        }
+
+        .gap-8 {
+            gap: 8px;
+        }
+        .flex {
+            display: flex;
+        }
+        .flex-center {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .flex-between {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .flex-wrap {
+            flex-wrap: wrap;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--color-gray-100);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--color-gray-300);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--color-gray-400);
+        }
+
+        :focus-visible {
+            outline: 2px solid var(--color-secondary);
+            outline-offset: 2px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ============================================================
+    HEADER (Hidden on login)
+    ============================================================ -->
+
+    <header class="app-header" id="appHeader" style="display:none;" role="banner">
+        <div class="container">
+            <div class="app-brand">
+                <img src="assets/scc-logo.png" alt="Supply Chain Circle Logo" class="brand-logo" />
+                <div class="brand-text">
+                    <span class="logo">BSCRI</span>
+                    <span class="divider"></span>
+                    <span class="subtitle">Admin Dashboard</span>
+                </div>
+            </div>
+            <div class="header-actions">
+                <span class="header-badge">Admin</span>
+                <button class="btn-logout" id="btnLogout">
+                    <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" />
+                        <polyline points="16 17 21 12 16 7" />
+                        <line x1="21" y1="12" x2="9" y2="12" />
+                    </svg>
+                    Logout
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- ============================================================
+    MAIN CONTENT
+    ============================================================ -->
+
+    <main role="main">
+        <div class="container">
+
+            <!-- ============================================================
+            SECTION: LOGIN
+            ============================================================ -->
+
+            <section id="loginSection" class="section-visible" aria-label="Admin login">
+                <div class="login-container">
+                    <div class="login-header">
+                        <img src="assets/scc-logo.png" alt="Supply Chain Circle Logo" class="login-logo" />
+                        <h2>BSCRI Admin</h2>
+                        <p>Supply Chain Circle · Botswana</p>
+                    </div>
+
+                    <div class="login-error" id="loginError">
+                        Invalid username or password. Please try again.
+                    </div>
+
+                    <form id="loginForm" autocomplete="off">
+                        <div class="form-group">
+                            <label for="username">Username</label>
+                            <input type="text" id="username" placeholder="Enter your username" required autofocus />
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <input type="password" id="password" placeholder="Enter your password" required />
+                        </div>
+                        <button type="submit" class="btn-login" id="btnLogin">Sign In</button>
+                    </form>
+
+                    <div class="login-footer">
+                        <p>&copy; 2026 <strong>Supply Chain Circle (SCC)</strong>. All rights reserved.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ============================================================
+            SECTION: DASHBOARD
+            ============================================================ -->
+
+            <section id="dashboardSection" class="section section-hidden" aria-label="Admin dashboard">
+
+                <div class="dashboard-header">
+                    <div>
+                        <h1>Dashboard</h1>
+                        <span class="last-updated" id="lastUpdated">Last updated: —</span>
+                    </div>
+                    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                        <button class="btn-refresh" id="btnRefresh">
+                            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="23 4 23 10 17 10" />
+                                <path d="M20.49 15a9 9 0 11-2.12-9.36L23 10" />
+                            </svg>
+                            Refresh
+                        </button>
+                        <button class="btn-export" id="btnExport">
+                            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+                                <polyline points="7 10 12 15 17 10" />
+                                <line x1="12" y1="15" x2="12" y2="3" />
+                            </svg>
+                            Export Data
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="stats-grid" id="statsGrid">
+                    <div class="stat-card">
+                        <div class="stat-label">Total Assessments</div>
+                        <div class="stat-value" id="statTotal">—</div>
+                        <div class="stat-sub" id="statRecent">Last 30 days: —</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Average Score</div>
+                        <div class="stat-value" id="statAvg">—</div>
+                        <div class="stat-sub">Overall readiness</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Sectors</div>
+                        <div class="stat-value" id="statSectors">—</div>
+                        <div class="stat-sub">Active sectors</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Regions</div>
+                        <div class="stat-value" id="statRegions">—</div>
+                        <div class="stat-sub">Active regions</div>
+                    </div>
+                </div>
+
+                <!-- Charts -->
+                <div class="chart-row">
+                    <div class="chart-box">
+                        <h4>Score by Sector</h4>
+                        <canvas id="sectorChart"></canvas>
+                    </div>
+                    <div class="chart-box">
+                        <h4>Maturity Distribution</h4>
+                        <canvas id="maturityChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Assessments Table -->
+                <div style="margin-top: 8px;">
+                    <div class="table-toolbar">
+                        <div class="filters">
+                            <select id="filterSector">
+                                <option value="">All Sectors</option>
+                            </select>
+                            <select id="filterRegion">
+                                <option value="">All Regions</option>
+                            </select>
+                            <select id="filterMaturity">
+                                <option value="">All Maturity Levels</option>
+                                <option value="foundational">Foundational</option>
+                                <option value="emerging">Emerging</option>
+                                <option value="developing">Developing</option>
+                                <option value="established">Established</option>
+                                <option value="advanced">Advanced</option>
+                            </select>
+                        </div>
+                        <div style="font-size:13px; color:var(--color-text-muted);">
+                            <span id="recordCount">0 records</span>
+                        </div>
+                    </div>
+
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Sector</th>
+                                    <th>Region</th>
+                                    <th>Size</th>
+                                    <th>Score</th>
+                                    <th>Maturity</th>
+                                    <th style="text-align:center;">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="assessmentsBody">
+                                <tr>
+                                    <td colspan="7" class="text-center" style="padding:24px;">
+                                        <div class="loading-spinner" style="width:32px;height:32px;"></div>
+                                        <div style="margin-top:8px;font-size:14px;color:var(--color-text-muted);">Loading assessments...</div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="table-pagination">
+                        <span id="paginationInfo">Showing 0 of 0</span>
+                        <div class="pagination-buttons" id="paginationButtons">
+                            <button id="pagePrev" disabled>Previous</button>
+                            <span id="pageNumbers" style="display:flex;gap:4px;align-items:center;"></span>
+                            <button id="pageNext" disabled>Next</button>
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+
+        </div>
+    </main>
+
+    <!-- ============================================================
+    DETAIL MODAL
+    ============================================================ -->
+
+    <div class="modal-overlay" id="detailModal">
+        <div class="modal-content">
+            <button class="modal-close" id="modalClose">&times;</button>
+            <h2 id="modalTitle">Assessment Details</h2>
+            <p class="modal-subtitle" id="modalSubtitle">Submitted on —</p>
+
+            <div class="detail-grid" id="modalMeta">
+                <div class="detail-item">
+                    <div class="label">Sector</div>
+                    <div class="value" id="modalSector">—</div>
+                </div>
+                <div class="detail-item">
+                    <div class="label">Region</div>
+                    <div class="value" id="modalRegion">—</div>
+                </div>
+                <div class="detail-item">
+                    <div class="label">Company Size</div>
+                    <div class="value" id="modalSize">—</div>
+                </div>
+                <div class="detail-item">
+                    <div class="label">Maturity Level</div>
+                    <div class="value" id="modalMaturity">—</div>
+                </div>
+            </div>
+
+            <h4 style="font-size:14px;font-weight:600;color:var(--color-text-light);margin-bottom:8px;">Dimension Scores</h4>
+            <div class="detail-scores" id="modalScores">
+                <!-- Rendered by JS -->
+            </div>
+
+            <div class="detail-responses">
+                <h4>Question Responses</h4>
+                <div id="modalResponses">
+                    <!-- Rendered by JS -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================
+    FOOTER
+    ============================================================ -->
+
+    <footer class="app-footer" id="appFooter" style="display:none;" role="contentinfo">
+        <div class="container">
+            <p><strong>BSCRI</strong> — Botswana Supply Chain Readiness Index</p>
+            <p class="copyright">&copy; 2026 Supply Chain Circle (SCC). All rights reserved.</p>
+            <div class="footer-links">
+                <a href="https://www.facebook.com/profile.php?id=61589321477563" target="_blank" rel="noopener noreferrer">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                    </svg>
+                    SCC Facebook
+                </a>
+                <a href="/" style="color:var(--color-primary);font-weight:500;">← Return to Assessment</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ============================================================
+    JAVASCRIPT
+    ============================================================ -->
+
+    <script>
+        /**
+         * BSCRI Admin Dashboard
+         * Botswana Supply Chain Readiness Index
+         * 
+         * Copyright © 2026 Supply Chain Circle (SCC)
+         * All rights reserved.
+         * 
+         * Professional admin interface for managing assessment data.
+         * 
+         * @version 1.0.0
+         * @author Supply Chain Circle (SCC)
+         */
+
+        // ============================================================
+        // CONFIGURATION
+        // ============================================================
+
+        const API_BASE_URL = 'http://localhost:5000/api';
+        const TOKEN_KEY = 'bscri_admin_token';
+        const PAGE_SIZE = 20;
+
+        // ============================================================
+        // STATE
+        // ============================================================
+
+        let token = null;
+        let assessments = [];
+        let filteredAssessments = [];
+        let currentPage = 1;
+        let totalPages = 1;
+        let totalRecords = 0;
+
+        let sectorChartInstance = null;
+        let maturityChartInstance = null;
+
+        // ============================================================
+        // DOM REFERENCES
+        // ============================================================
+
+        const loginSection = document.getElementById('loginSection');
+        const dashboardSection = document.getElementById('dashboardSection');
+        const appHeader = document.getElementById('appHeader');
+        const appFooter = document.getElementById('appFooter');
+
+        const loginForm = document.getElementById('loginForm');
+        const loginError = document.getElementById('loginError');
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        const btnLogin = document.getElementById('btnLogin');
+
+        const btnLogout = document.getElementById('btnLogout');
+        const btnRefresh = document.getElementById('btnRefresh');
+        const btnExport = document.getElementById('btnExport');
+
+        const statTotal = document.getElementById('statTotal');
+        const statRecent = document.getElementById('statRecent');
+        const statAvg = document.getElementById('statAvg');
+        const statSectors = document.getElementById('statSectors');
+        const statRegions = document.getElementById('statRegions');
+
+        const filterSector = document.getElementById('filterSector');
+        const filterRegion = document.getElementById('filterRegion');
+        const filterMaturity = document.getElementById('filterMaturity');
+
+        const assessmentsBody = document.getElementById('assessmentsBody');
+        const recordCount = document.getElementById('recordCount');
+        const paginationInfo = document.getElementById('paginationInfo');
+        const pagePrev = document.getElementById('pagePrev');
+        const pageNext = document.getElementById('pageNext');
+        const pageNumbers = document.getElementById('pageNumbers');
+
+        const lastUpdated = document.getElementById('lastUpdated');
+
+        const detailModal = document.getElementById('detailModal');
+        const modalClose = document.getElementById('modalClose');
+
+        // ============================================================
+        // AUTHENTICATION
+        // ============================================================
+
+        function getToken() {
+            return localStorage.getItem(TOKEN_KEY);
+        }
+
+        function setToken(t) {
+            token = t;
+            localStorage.setItem(TOKEN_KEY, t);
+        }
+
+        function clearToken() {
+            token = null;
+            localStorage.removeItem(TOKEN_KEY);
+        }
+
+        function isAuthenticated() {
+            return !!getToken();
+        }
+
+        function showLogin() {
+            loginSection.classList.remove('section-hidden');
+            loginSection.classList.add('section-visible');
+            dashboardSection.classList.remove('section-visible');
+            dashboardSection.classList.add('section-hidden');
+            appHeader.style.display = 'none';
+            appFooter.style.display = 'none';
+        }
+
+        function showDashboard() {
+            loginSection.classList.remove('section-visible');
+            loginSection.classList.add('section-hidden');
+            dashboardSection.classList.remove('section-hidden');
+            dashboardSection.classList.add('section-visible');
+            appHeader.style.display = 'flex';
+            appFooter.style.display = 'block';
+            loadDashboard();
+        }
+
+        // ============================================================
+        // LOGIN
+        // ============================================================
+
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            loginError.classList.remove('visible');
+
+            const username = usernameInput.value.trim();
+            const password = passwordInput.value.trim();
+
+            if (!username || !password) {
+                loginError.textContent = 'Please enter both username and password.';
+                loginError.classList.add('visible');
+                return;
+            }
+
+            btnLogin.disabled = true;
+            btnLogin.textContent = 'Signing in...';
+
+            try {
+                const response = await fetch(API_BASE_URL + '/admin/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Invalid credentials');
+                }
+
+                if (data.success && data.token) {
+                    setToken(data.token);
+                    showDashboard();
+                } else {
+                    throw new Error('Invalid response from server');
+                }
+
+            } catch (error) {
+                console.error('Login error:', error);
+                loginError.textContent = error.message || 'Invalid username or password. Please try again.';
+                loginError.classList.add('visible');
+            } finally {
+                btnLogin.disabled = false;
+                btnLogin.textContent = 'Sign In';
+            }
+        });
+
+        // ============================================================
+        // LOGOUT
+        // ============================================================
+
+        btnLogout.addEventListener('click', () => {
+            clearToken();
+            showLogin();
+            usernameInput.focus();
+        });
+
+        // ============================================================
+        // API HELPERS
+        // ============================================================
+
+        async function apiFetch(endpoint, options = {}) {
+            const headers = {
+                'Content-Type': 'application/json',
+                ...options.headers
+            };
+
+            if (token) {
+                headers['Authorization'] = `Bearer ${token}`;
+            }
+
+            const response = await fetch(API_BASE_URL + endpoint, {
+                ...options,
+                headers
+            });
+
+            if (response.status === 401) {
+                clearToken();
+                showLogin();
+                throw new Error('Session expired. Please login again.');
+            }
+
+            if (!response.ok) {
+                const data = await response.json().catch(() => ({}));
+                throw new Error(data.error || `Request failed with status ${response.status}`);
+            }
+
+            return response.json();
+        }
+
+        // ============================================================
+        // DASHBOARD LOADING
+        // ============================================================
+
+        async function loadDashboard() {
+            try {
+                await Promise.all([
+                    loadStats(),
+                    loadAssessments()
+                ]);
+                updateLastUpdated();
+
+            } catch (error) {
+                console.error('Dashboard load error:', error);
+                // Show error in table
+                assessmentsBody.innerHTML = `
+                            <tr>
+                                <td colspan="7" class="text-center" style="padding:24px;color:var(--color-danger);">
+                                    <strong>Error loading data:</strong> ${error.message}
+                                </td>
+                            </tr>
+                        `;
+            }
+        }
+
+        async function loadStats() {
+            try {
+                const data = await apiFetch('/admin/stats');
+
+                // Total
+                statTotal.textContent = data.total || 0;
+                statRecent.textContent = data.recentCount !== undefined ? `Last 30 days: ${data.recentCount}` : '—';
+
+                // Average
+                if (data.averages && data.averages.avgOverall !== undefined) {
+                    statAvg.textContent = Math.round(data.averages.avgOverall) + '%';
+                } else {
+                    statAvg.textContent = '—';
+                }
+
+                // Sectors
+                statSectors.textContent = data.bySector ? data.bySector.length : '—';
+
+                // Regions
+                statRegions.textContent = data.byRegion ? data.byRegion.length : '—';
+
+                // Populate filter dropdowns
+                populateFilters(data);
+
+                // Render charts
+                renderSectorChart(data.bySector);
+                renderMaturityChart(data.byMaturity);
+
+            } catch (error) {
+                console.error('Stats load error:', error);
+                statTotal.textContent = 'Error';
+                statAvg.textContent = 'Error';
+                statSectors.textContent = '—';
+                statRegions.textContent = '—';
+            }
+        }
+
+        function populateFilters(data) {
+            // Sector filter
+            const currentSector = filterSector.value;
+            filterSector.innerHTML = '<option value="">All Sectors</option>';
+            if (data.bySector) {
+                data.bySector.forEach(item => {
+                    const opt = document.createElement('option');
+                    opt.value = item._id;
+                    opt.textContent = item._id.charAt(0).toUpperCase() + item._id.slice(1);
+                    filterSector.appendChild(opt);
+                });
+            }
+            filterSector.value = currentSector;
+
+            // Region filter
+            const currentRegion = filterRegion.value;
+            filterRegion.innerHTML = '<option value="">All Regions</option>';
+            if (data.byRegion) {
+                data.byRegion.forEach(item => {
+                    const opt = document.createElement('option');
+                    opt.value = item._id;
+                    opt.textContent = item._id.charAt(0).toUpperCase() + item._id.slice(1);
+                    filterRegion.appendChild(opt);
+                });
+            }
+            filterRegion.value = currentRegion;
+        }
+
+        // ============================================================
+        // ASSESSMENTS LIST
+        // ============================================================
+
+        async function loadAssessments(page = 1) {
+            currentPage = page;
+
+            // Build query params
+            const params = new URLSearchParams();
+            params.set('limit', PAGE_SIZE);
+            params.set('skip', (page - 1) * PAGE_SIZE);
+
+            if (filterSector.value) params.set('sector', filterSector.value);
+            if (filterRegion.value) params.set('region', filterRegion.value);
+
+            try {
+                const data = await apiFetch('/admin/assessments?' + params.toString());
+
+                assessments = data.data || [];
+                totalRecords = data.pagination?.total || 0;
+                totalPages = data.pagination?.pages || 1;
+
+                renderAssessments();
+                updatePagination();
+
+            } catch (error) {
+                console.error('Assessments load error:', error);
+                assessmentsBody.innerHTML = `
+                            <tr>
+                                <td colspan="7" class="text-center" style="padding:24px;color:var(--color-danger);">
+                                    <strong>Error loading assessments:</strong> ${error.message}
+                                </td>
+                            </tr>
+                        `;
+            }
+        }
+
+        function renderAssessments() {
+            if (!assessments || assessments.length === 0) {
+                assessmentsBody.innerHTML = `
+                            <tr>
+                                <td colspan="7" class="text-center" style="padding:24px;color:var(--color-text-muted);">
+                                    <div style="font-size:32px;margin-bottom:8px;">📋</div>
+                                    <strong>No assessments found</strong>
+                                    <p style="font-size:13px;margin-top:4px;">Try adjusting your filters or wait for submissions.</p>
+                                </td>
+                            </tr>
+                        `;
+                recordCount.textContent = '0 records';
+                return;
+            }
+
+            let html = '';
+            assessments.forEach(item => {
+                const date = new Date(item.submittedAt).toLocaleDateString();
+                const time = new Date(item.submittedAt).toLocaleTimeString();
+
+                const overall = item.scores?.overall || 0;
+                let scoreClass = 'score-low';
+                if (overall >= 71) scoreClass = 'score-high';
+                else if (overall >= 41) scoreClass = 'score-mid';
+
+                const maturity = item.maturityLevel || 'foundational';
+                const maturityClass = 'maturity-' + maturity;
+
+                const sector = item.sector || '—';
+                const region = item.region || '—';
+                const size = item.companySize || '—';
+
+                html += `
+                            <tr>
+                                <td style="white-space:nowrap;">${date} ${time}</td>
+                                <td>${sector.charAt(0).toUpperCase() + sector.slice(1)}</td>
+                                <td>${region.charAt(0).toUpperCase() + region.slice(1)}</td>
+                                <td>${size.charAt(0).toUpperCase() + size.slice(1)}</td>
+                                <td><span class="score-badge ${scoreClass}">${Math.round(overall)}%</span></td>
+                                <td><span class="maturity-tag ${maturityClass}">${maturity}</span></td>
+                                <td style="text-align:center;">
+                                    <button class="btn-view" data-id="${item.id}">View</button>
+                                </td>
+                            </tr>
+                        `;
+            });
+
+            assessmentsBody.innerHTML = html;
+            recordCount.textContent = `${totalRecords} records`;
+
+            // Attach view handlers
+            assessmentsBody.querySelectorAll('.btn-view').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const id = btn.dataset.id;
+                    const assessment = assessments.find(a => a.id === id);
+                    if (assessment) showDetail(assessment);
+                });
+            });
+        }
+
+        function updatePagination() {
+            const start = (currentPage - 1) * PAGE_SIZE + 1;
+            const end = Math.min(currentPage * PAGE_SIZE, totalRecords);
+            paginationInfo.textContent = `Showing ${totalRecords > 0 ? start : 0}–${end} of ${totalRecords}`;
+
+            pagePrev.disabled = currentPage <= 1;
+            pageNext.disabled = currentPage >= totalPages;
+
+            // Page numbers
+            pageNumbers.innerHTML = '';
+            const maxVisible = 7;
+            let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+            let endPage = Math.min(totalPages, startPage + maxVisible - 1);
+
+            if (endPage - startPage < maxVisible - 1) {
+                startPage = Math.max(1, endPage - maxVisible + 1);
+            }
+
+            for (let i = startPage; i <= endPage; i++) {
+                const btn = document.createElement('button');
+                btn.textContent = i;
+                if (i === currentPage) btn.classList.add('active');
+                btn.addEventListener('click', () => loadAssessments(i));
+                pageNumbers.appendChild(btn);
+            }
+        }
+
+        // ============================================================
+        // FILTERS
+        // ============================================================
+
+        filterSector.addEventListener('change', () => loadAssessments(1));
+        filterRegion.addEventListener('change', () => loadAssessments(1));
+        filterMaturity.addEventListener('change', () => {
+            // Maturity filter not implemented on backend yet
+            // For now, just reload with other filters
+            loadAssessments(1);
+        });
+
+        pagePrev.addEventListener('click', () => {
+            if (currentPage > 1) loadAssessments(currentPage - 1);
+        });
+
+        pageNext.addEventListener('click', () => {
+            if (currentPage < totalPages) loadAssessments(currentPage + 1);
+        });
+
+        btnRefresh.addEventListener('click', () => {
+            btnRefresh.disabled = true;
+            btnRefresh.innerHTML = `
+                        <span class="loading-spinner" style="width:16px;height:16px;border-width:2px;"></span>
+                        Loading...
+                    `;
+            loadDashboard().finally(() => {
+                btnRefresh.disabled = false;
+                btnRefresh.innerHTML = `
+                            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;stroke:currentColor;stroke-width:2.5;fill:none;">
+                                <polyline points="23 4 23 10 17 10" />
+                                <path d="M20.49 15a9 9 0 11-2.12-9.36L23 10" />
+                            </svg>
+                            Refresh
+                        `;
+            });
+        });
+
+        // ============================================================
+        // EXPORT
+        // ============================================================
+
+        btnExport.addEventListener('click', async () => {
+            try {
+                btnExport.disabled = true;
+                btnExport.innerHTML = `
+                            <span class="loading-spinner" style="width:16px;height:16px;border-width:2px;"></span>
+                            Exporting...
+                        `;
+
+                const data = await apiFetch('/admin/export');
+
+                // Create download
+                const blob = new Blob([JSON.stringify(data.data, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `bscri_export_${new Date().toISOString().slice(0,10)}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+
+            } catch (error) {
+                console.error('Export error:', error);
+                alert('Export failed: ' + error.message);
+            } finally {
+                btnExport.disabled = false;
+                btnExport.innerHTML = `
+                            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;stroke:currentColor;stroke-width:2.5;fill:none;">
+                                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+                                <polyline points="7 10 12 15 17 10" />
+                                <line x1="12" y1="15" x2="12" y2="3" />
+                            </svg>
+                            Export Data
+                        `;
+            }
+        });
+
+        // ============================================================
+        // CHARTS
+        // ============================================================
+
+        function renderSectorChart(bySector) {
+            const canvas = document.getElementById('sectorChart');
+            if (!canvas) return;
+
+            if (sectorChartInstance) {
+                sectorChartInstance.destroy();
+                sectorChartInstance = null;
+            }
+
+            const labels = (bySector || []).map(item =>
+                item._id.charAt(0).toUpperCase() + item._id.slice(1)
+            );
+            const data = (bySector || []).map(item => Math.round(item.avgScore || 0));
+
+            if (data.length === 0) {
+                sectorChartInstance = new Chart(canvas, {
+                    type: 'bar',
+                    data: {
+                        labels: ['No Data'],
+                        datasets: [{
+                            label: 'Average Score',
+                            data: [0],
+                            backgroundColor: 'rgba(200,200,200,0.5)',
+                            borderColor: '#999',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: { min: 0, max: 100, ticks: { stepSize: 20 } }
+                        }
+                    }
+                });
+                return;
+            }
+
+            const colors = data.map(v =>
+                v >= 71 ? 'rgba(25,135,84,0.7)' :
+                v >= 41 ? 'rgba(255,193,7,0.7)' :
+                'rgba(220,53,69,0.7)'
+            );
+            const borderColors = data.map(v =>
+                v >= 71 ? '#198754' :
+                v >= 41 ? '#ffc107' :
+                '#dc3545'
+            );
+
+            sectorChartInstance = new Chart(canvas, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Average Score',
+                        data: data,
+                        backgroundColor: colors,
+                        borderColor: borderColors,
+                        borderWidth: 2,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            min: 0,
+                            max: 100,
+                            ticks: { stepSize: 20, font: { size: 10 } }
+                        },
+                        x: {
+                            ticks: { font: { size: 10 }, maxRotation: 45 }
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderMaturityChart(byMaturity) {
+            const canvas = document.getElementById('maturityChart');
+            if (!canvas) return;
+
+            if (maturityChartInstance) {
+                maturityChartInstance.destroy();
+                maturityChartInstance = null;
+            }
+
+            const labels = (byMaturity || []).map(item => {
+                const map = {
+                    foundational: 'Foundational',
+                    emerging: 'Emerging',
+                    developing: 'Developing',
+                    established: 'Established',
+                    advanced: 'Advanced'
+                };
+                return map[item._id] || item._id;
+            });
+            const data = (byMaturity || []).map(item => item.count);
+
+            if (data.length === 0) {
+                maturityChartInstance = new Chart(canvas, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['No Data'],
+                        datasets: [{
+                            data: [1],
+                            backgroundColor: ['#e9ecef'],
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: { legend: { display: true, position: 'bottom' } }
+                    }
+                });
+                return;
+            }
+
+            const colors = {
+                foundational: '#dc3545',
+                emerging: '#fd7e14',
+                developing: '#ffc107',
+                established: '#0d6efd',
+                advanced: '#198754'
+            };
+
+            const bgColors = (byMaturity || []).map(item =>
+                colors[item._id] || '#6c757d'
+            );
+
+            maturityChartInstance = new Chart(canvas, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: bgColors,
+                        borderColor: '#ffffff',
+                        borderWidth: 2,
+                        hoverOffset: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'bottom',
+                            labels: {
+                                font: { size: 11 },
+                                padding: 12,
+                                usePointStyle: true,
+                                pointStyle: 'circle'
+                            }
+                        }
+                    },
+                    cutout: '60%'
+                }
+            });
+        }
+
+        // ============================================================
+        // DETAIL MODAL
+        // ============================================================
+
+        function showDetail(assessment) {
+            const date = new Date(assessment.submittedAt).toLocaleString();
+
+            document.getElementById('modalTitle').textContent = 'Assessment Details';
+            document.getElementById('modalSubtitle').textContent = `Submitted on ${date}`;
+
+            document.getElementById('modalSector').textContent =
+                (assessment.sector || '—').charAt(0).toUpperCase() + (assessment.sector || '').slice(1);
+            document.getElementById('modalRegion').textContent =
+                (assessment.region || '—').charAt(0).toUpperCase() + (assessment.region || '').slice(1);
+            document.getElementById('modalSize').textContent =
+                (assessment.companySize || '—').charAt(0).toUpperCase() + (assessment.companySize || '').slice(1);
+
+            const maturityMap = {
+                foundational: 'Foundational',
+                emerging: 'Emerging',
+                developing: 'Developing',
+                established: 'Established',
+                advanced: 'Advanced'
+            };
+            const maturityLabel = maturityMap[assessment.maturityLevel] || assessment.maturityLevel || '—';
+            const maturityColor = {
+                foundational: '#dc3545',
+                emerging: '#fd7e14',
+                developing: '#ffc107',
+                established: '#0d6efd',
+                advanced: '#198754'
+            } [assessment.maturityLevel] || '#6c757d';
+
+            document.getElementById('modalMaturity').innerHTML =
+                `<span style="display:inline-block;padding:2px 12px;border-radius:12px;background:${maturityColor};color:#fff;font-size:13px;font-weight:600;">${maturityLabel}</span>`;
+
+            // Dimension scores
+            const scores = assessment.scores || {};
+            const dims = [
+                { key: 'procurement', label: 'Procurement' },
+                { key: 'logistics', label: 'Logistics' },
+                { key: 'compliance', label: 'Compliance' },
+                { key: 'digital', label: 'Digital' },
+                { key: 'supplier', label: 'Supplier' },
+                { key: 'resilience', label: 'Resilience' },
+                { key: 'trade', label: 'Trade' }
+            ];
+
+            let scoresHtml = dims.map(d => {
+                const val = scores[d.key] || 0;
+                let color = '#dc3545';
+                if (val >= 86) color = '#198754';
+                else if (val >= 71) color = '#0d6efd';
+                else if (val >= 56) color = '#ffc107';
+                else if (val >= 41) color = '#fd7e14';
+                return `
+                            <div class="score-item">
+                                <div class="dim">${d.label}</div>
+                                <div class="val" style="color:${color};">${Math.round(val)}</div>
+                            </div>
+                        `;
+            }).join('');
+
+            // Also add overall
+            scoresHtml += `
+                        <div class="score-item" style="background:var(--color-primary);color:#fff;">
+                            <div class="dim" style="color:rgba(255,255,255,0.7);">Overall</div>
+                            <div class="val" style="color:#fff;">${Math.round(scores.overall || 0)}</div>
+                        </div>
+                    `;
+
+            document.getElementById('modalScores').innerHTML = scoresHtml;
+
+            // Responses
+            const responses = assessment.responses || {};
+            const questionLabels = [
+                'Strategic sourcing process',
+                'Supplier performance evaluation',
+                'Contract management',
+                'Procurement ethics policy',
+                'Transportation management',
+                'Warehouse operations',
+                'Inventory management',
+                'Last-mile delivery',
+                'Regulatory knowledge',
+                'Procurement policy',
+                'Contract compliance',
+                'Governance structures',
+                'Digital tools usage',
+                'Data collection & analysis',
+                'Digital communication',
+                'Supplier relationship management',
+                'Local supplier development',
+                'Supplier diversity',
+                'Collaborative planning',
+                'Risk identification',
+                'Business continuity planning',
+                'Supplier diversification',
+                'Export documentation knowledge',
+                'Cross-border logistics experience',
+                'Regional market knowledge'
+            ];
+
+            let responsesHtml = '';
+            for (let i = 1; i <= 25; i++) {
+                const key = 'q' + i;
+                const value = responses[key];
+                const label = questionLabels[i - 1] || `Question ${i}`;
+                const displayValue = value !== undefined ? value : '—';
+                responsesHtml += `
+                            <div class="response-item">
+                                <span class="q">Q${i}. ${label}</span>
+                                <span class="a">${displayValue}</span>
+                            </div>
+                        `;
+            }
+
+            document.getElementById('modalResponses').innerHTML = responsesHtml;
+
+            detailModal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeDetail() {
+            detailModal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        modalClose.addEventListener('click', closeDetail);
+        detailModal.addEventListener('click', (e) => {
+            if (e.target === detailModal) closeDetail();
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeDetail();
+        });
+
+        // ============================================================
+        // HELPERS
+        // ============================================================
+
+        function updateLastUpdated() {
+            const now = new Date();
+            const dateStr = now.toLocaleDateString();
+            const timeStr = now.toLocaleTimeString();
+            lastUpdated.textContent = `Last updated: ${dateStr} ${timeStr}`;
+        }
+
+        // ============================================================
+        // INITIALIZATION
+        // ============================================================
+
+        // Check for existing session
+        if (isAuthenticated()) {
+            token = getToken();
+            showDashboard();
+        } else {
+            showLogin();
+            usernameInput.focus();
+        }
+
+        // Auto-refresh every 60 seconds
+        setInterval(() => {
+            if (isAuthenticated()) {
+                loadStats();
+                loadAssessments(currentPage);
+                updateLastUpdated();
+            }
+        }, 60000);
+
+        console.log('BSCRI Admin Dashboard initialized.');
+        console.log('API base URL: ' + API_BASE_URL);
+    </script>
+
+</body>
+</html>
