@@ -45,22 +45,31 @@ const { initializeDatabase } = require('./config/database');
 // ============================================================
 
 const allowedOrigins = [
-  process.env.FRONTEND_URL,
-  `http://localhost:${PORT}`,
-  `http://127.0.0.1:${PORT}`,
-  'http://localhost:5500',
-  'http://127.0.0.1:5500'
+  'https://bscri1.netlify.app',
+  'https://bscri1.vercel.app',
+  'https://bscri1-production.up.railway.app',
+  process.env.FRONTEND_URL
 ].filter(Boolean);
+
+const uniqueAllowedOrigins = [...new Set(allowedOrigins)];
+
+console.log('Allowed CORS origins:', uniqueAllowedOrigins);
 
 const corsOptions = {
   origin(origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
+    if (!origin) {
+      console.log('Allowed CORS request with no origin header');
+      return callback(null, true);
+    }
+
+    if (uniqueAllowedOrigins.includes(origin)) {
+      console.log('Allowed CORS request:', { origin });
       return callback(null, true);
     }
 
     console.warn('Blocked CORS request:', {
       origin,
-      allowedOrigins
+      allowedOrigins: uniqueAllowedOrigins
     });
 
     return callback(new Error(`Origin ${origin} is not allowed by CORS`));
@@ -69,7 +78,7 @@ const corsOptions = {
 };
 
 if (!process.env.FRONTEND_URL) {
-  console.warn('FRONTEND_URL environment variable is not set. Using local development CORS defaults.');
+  console.warn('FRONTEND_URL environment variable is not set. Using explicit production CORS defaults.');
 }
 
 app.use(cors(corsOptions));
